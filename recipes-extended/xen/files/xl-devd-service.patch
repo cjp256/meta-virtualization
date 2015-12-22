@@ -1,4 +1,4 @@
-commit e8e851c9422cf6d400d108c01fc9b411b4dafea9
+commit 69509c51feed4c85c247f0cd620bdf986d695cc1
 Author: Chris Patterson <cjp256@gmail.com>
 Date:   Tue Dec 22 14:38:05 2015 -0500
 
@@ -8,8 +8,6 @@ Date:   Tue Dec 22 14:38:05 2015 -0500
     script "xendriverdomain".
     
     Signed-off-by: Chris Patterson <cjp256@gmail.com>
-
-Upstream-status: Pending
 
 diff --git a/tools/configure b/tools/configure
 index 41bed77..55825c8 100755
@@ -58,19 +56,20 @@ index 83e3b32..d2027de 100644
  			$(XEN_SYSTEMD_MOUNT)	\
 diff --git a/tools/hotplug/Linux/systemd/xen-xl-devd.service.in b/tools/hotplug/Linux/systemd/xen-xl-devd.service.in
 new file mode 100644
-index 0000000..f3a00f7
+index 0000000..1ba4c9c
 --- /dev/null
 +++ b/tools/hotplug/Linux/systemd/xen-xl-devd.service.in
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,17 @@
 +[Unit]
 +Description=Script to start services needed in a Xen driver domain (xl devd)
 +Requires=proc-xen.mount
-+After=proc-xen.mount
++After=proc-xen.mount remote-fs.target
 +ConditionPathExists=/proc/xen/capabilities
 +
 +[Service]
-+Type=simple
++Type=forking
 +Environment=XLDEVD_ARGS=
++EnvironmentFile=-/etc/default/xendriverdomain
 +PIDFile=@XEN_RUN_DIR@/xldevd.pid
 +ExecStartPre=/bin/grep -q control_d /proc/xen/capabilities
 +ExecStartPre=/bin/mkdir -p @XEN_RUN_DIR@
