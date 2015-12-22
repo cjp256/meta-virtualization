@@ -3,6 +3,7 @@ require xen.inc
 SRC_URI = " \
     http://bits.xensource.com/oss-xen/release/${PV}/xen-${PV}.tar.gz \
     file://xen-x86-Fix-up-rules-when-forcing-mno-sse.patch \
+    file://xl-devd-service.patch \
     "
 
 SRC_URI[md5sum] = "48e232f90927c08326a7b52bb06f49bc"

@@ -1,0 +1,80 @@
+commit e8e851c9422cf6d400d108c01fc9b411b4dafea9
+Author: Chris Patterson <cjp256@gmail.com>
+Date:   Tue Dec 22 14:38:05 2015 -0500
+
+    systemd: add xl devd service
+    
+    Provide systemd service equivalent to the sysvinit
+    script "xendriverdomain".
+    
+    Signed-off-by: Chris Patterson <cjp256@gmail.com>
+
+Upstream-status: Pending
+
+diff --git a/tools/configure b/tools/configure
+index 41bed77..55825c8 100755
+--- a/tools/configure
++++ b/tools/configure
+@@ -9335,7 +9335,7 @@ fi
+ 
+ if test "x$systemd" = "xy"; then :
+ 
+-    ac_config_files="$ac_config_files hotplug/Linux/systemd/proc-xen.mount hotplug/Linux/systemd/var-lib-xenstored.mount hotplug/Linux/systemd/xen-init-dom0.service hotplug/Linux/systemd/xen-qemu-dom0-disk-backend.service hotplug/Linux/systemd/xen-watchdog.service hotplug/Linux/systemd/xenconsoled.service hotplug/Linux/systemd/xendomains.service hotplug/Linux/systemd/xenstored.service hotplug/Linux/systemd/xenstored.socket hotplug/Linux/systemd/xenstored_ro.socket"
++    ac_config_files="$ac_config_files hotplug/Linux/systemd/proc-xen.mount hotplug/Linux/systemd/var-lib-xenstored.mount hotplug/Linux/systemd/xen-init-dom0.service hotplug/Linux/systemd/xen-qemu-dom0-disk-backend.service hotplug/Linux/systemd/xen-watchdog.service hotplug/Linux/systemd/xen-xl-devd.service hotplug/Linux/systemd/xenconsoled.service hotplug/Linux/systemd/xendomains.service hotplug/Linux/systemd/xenstored.service hotplug/Linux/systemd/xenstored.socket hotplug/Linux/systemd/xenstored_ro.socket"
+ 
+ 
+ fi
+@@ -10053,6 +10053,7 @@ do
+     "hotplug/Linux/systemd/xen-init-dom0.service") CONFIG_FILES="$CONFIG_FILES hotplug/Linux/systemd/xen-init-dom0.service" ;;
+     "hotplug/Linux/systemd/xen-qemu-dom0-disk-backend.service") CONFIG_FILES="$CONFIG_FILES hotplug/Linux/systemd/xen-qemu-dom0-disk-backend.service" ;;
+     "hotplug/Linux/systemd/xen-watchdog.service") CONFIG_FILES="$CONFIG_FILES hotplug/Linux/systemd/xen-watchdog.service" ;;
++    "hotplug/Linux/systemd/xen-xl-devd.service") CONFIG_FILES="$CONFIG_FILES hotplug/Linux/systemd/xen-xl-devd.service" ;;
+     "hotplug/Linux/systemd/xenconsoled.service") CONFIG_FILES="$CONFIG_FILES hotplug/Linux/systemd/xenconsoled.service" ;;
+     "hotplug/Linux/systemd/xendomains.service") CONFIG_FILES="$CONFIG_FILES hotplug/Linux/systemd/xendomains.service" ;;
+     "hotplug/Linux/systemd/xenstored.service") CONFIG_FILES="$CONFIG_FILES hotplug/Linux/systemd/xenstored.service" ;;
+diff --git a/tools/configure.ac b/tools/configure.ac
+index 6c70040..4fa2986 100644
+--- a/tools/configure.ac
++++ b/tools/configure.ac
+@@ -429,6 +429,7 @@ AS_IF([test "x$systemd" = "xy"], [
+     hotplug/Linux/systemd/xen-init-dom0.service
+     hotplug/Linux/systemd/xen-qemu-dom0-disk-backend.service
+     hotplug/Linux/systemd/xen-watchdog.service
++    hotplug/Linux/systemd/xen-xl-devd.service
+     hotplug/Linux/systemd/xenconsoled.service
+     hotplug/Linux/systemd/xendomains.service
+     hotplug/Linux/systemd/xenstored.service
+diff --git a/tools/hotplug/Linux/systemd/Makefile b/tools/hotplug/Linux/systemd/Makefile
+index 83e3b32..d2027de 100644
+--- a/tools/hotplug/Linux/systemd/Makefile
++++ b/tools/hotplug/Linux/systemd/Makefile
+@@ -15,6 +15,7 @@ XEN_SYSTEMD_SERVICE += xen-qemu-dom0-disk-backend.service
+ XEN_SYSTEMD_SERVICE += xendomains.service
+ XEN_SYSTEMD_SERVICE += xen-watchdog.service
+ XEN_SYSTEMD_SERVICE += xen-init-dom0.service
++XEN_SYSTEMD_SERVICE += xen-xl-devd.service
+ 
+ ALL_XEN_SYSTEMD =	$(XEN_SYSTEMD_MODULES)  \
+ 			$(XEN_SYSTEMD_MOUNT)	\
+diff --git a/tools/hotplug/Linux/systemd/xen-xl-devd.service.in b/tools/hotplug/Linux/systemd/xen-xl-devd.service.in
+new file mode 100644
+index 0000000..f3a00f7
+--- /dev/null
++++ b/tools/hotplug/Linux/systemd/xen-xl-devd.service.in
+@@ -0,0 +1,16 @@
++[Unit]
++Description=Script to start services needed in a Xen driver domain (xl devd)
++Requires=proc-xen.mount
++After=proc-xen.mount
++ConditionPathExists=/proc/xen/capabilities
++
++[Service]
++Type=simple
++Environment=XLDEVD_ARGS=
++PIDFile=@XEN_RUN_DIR@/xldevd.pid
++ExecStartPre=/bin/grep -q control_d /proc/xen/capabilities
++ExecStartPre=/bin/mkdir -p @XEN_RUN_DIR@
++ExecStart=@sbindir@/xl devd --pidfile=@XEN_RUN_DIR@/xldevd.pid $XLDEVD_ARGS
++
++[Install]
++WantedBy=multi-user.target

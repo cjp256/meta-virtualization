@@ -145,6 +145,7 @@ PACKAGES = "\
     ${PN}-console \
     ${PN}-dbg \
     ${PN}-dev \
+    ${PN}-devd \
     ${PN}-doc \
     ${PN}-flask \
     ${PN}-fsimage \
@@ -658,7 +659,8 @@ INITSCRIPT_NAME_${PN}-devd = "xendriverdomain"
 INITSCRIPT_PARAMS_${PN}-devd = "defaults 82"
 
 # systemd packages
-SYSTEMD_PACKAGES = "${PN}-xen-watchdog ${PN}-xencommons ${PN}-xendomains"
+SYSTEMD_PACKAGES = "${PN}-xen-watchdog ${PN}-xencommons ${PN}-xendomains ${PN}-devd"
+SYSTEMD_SERVICE_${PN}-devd = "xen-xl-devd.service"
 SYSTEMD_SERVICE_${PN}-watchdog = "xen-watchdog.service"
 SYSTEMD_SERVICE_${PN}-xencommons = " \
     proc-xen.mount \
