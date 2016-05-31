@@ -17,6 +17,12 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.contains('XEN_TARGET_ARCH', 'x86_64', 'hvm', '', d)} \
     "
 
+SRC_URI_append = " \
+    file://0001-libfsimage-replace-deprecated-readdir_r-with-readdir.patch \
+    file://0002-libxl-replace-deprecated-readdir_r-with-readdir.patch \
+    file://0001-xen-Makefile-quote-HOSTCC-and-HOSTCXX-args.patch \
+"
+
 FLASK_POLICY_FILE ?= "xenpolicy-${PV}"
 
 PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,virtual/libsdl,"
@@ -151,6 +157,7 @@ PACKAGES = "\
     ${PN}-base \
     ${PN}-blktap \
     ${PN}-console \
+    ${PN}-cpuid \
     ${PN}-dbg \
     ${PN}-dev \
     ${PN}-devd \
@@ -223,6 +230,7 @@ PACKAGES = "\
     ${PN}-xl-examples \
     ${PN}-xm \
     ${PN}-xm-examples \
+    ${PN}-xsplice \
     "
 
 FILES_${PN}-dbg += "\
@@ -367,6 +375,10 @@ FILES_${PN}-blktap = "\
 FILES_${PN}-console = "\
     ${libdir}/xen/bin/xenconsole \
     ${sbindir}/xenconsoled \
+    "
+
+FILES_${PN}-cpuid = "\
+    ${bindir}/xen-cpuid \
     "
 
 FILES_${PN}-devd = "\
@@ -527,6 +539,7 @@ FILES_${PN}-remus = "\
     "
 
 FILES_${PN}-scripts-network = " \
+    ${sysconfdir}/xen/scripts/colo-proxy-setup \
     ${sysconfdir}/xen/scripts/network-bridge \
     ${sysconfdir}/xen/scripts/network-nat \
     ${sysconfdir}/xen/scripts/network-route \
@@ -544,6 +557,7 @@ FILES_${PN}-scripts-block = " \
     ${sysconfdir}/xen/scripts/blktap \
     ${sysconfdir}/xen/scripts/block \
     ${sysconfdir}/xen/scripts/block-common.sh \
+    ${sysconfdir}/xen/scripts/block-dummy \
     ${sysconfdir}/xen/scripts/block-enbd \
     ${sysconfdir}/xen/scripts/block-iscsi \
     ${sysconfdir}/xen/scripts/block-nbd \
@@ -689,6 +703,10 @@ FILES_${PN}-xendomains += "\
     ${sysconfdir}/init.d/xendomains \
     ${sysconfdir}/sysconfig/xendomains \
     ${systemd_unitdir}/system/xendomains.service \
+    "
+
+FILES_${PN}-xsplice += " \
+    ${sbindir}/xen-xsplice \
     "
 
 # configure init.d scripts
@@ -837,6 +855,7 @@ do_configure() {
 }
 
 do_compile() {
+    unset CFLAGS
     oe_runmake
 }
 
