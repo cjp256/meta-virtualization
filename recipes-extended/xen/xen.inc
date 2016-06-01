@@ -20,7 +20,6 @@ PACKAGECONFIG ??= " \
 SRC_URI_append = " \
     file://0001-libfsimage-replace-deprecated-readdir_r-with-readdir.patch \
     file://0002-libxl-replace-deprecated-readdir_r-with-readdir.patch \
-    file://0001-xen-Makefile-quote-HOSTCC-and-HOSTCXX-args.patch \
 "
 
 FLASK_POLICY_FILE ?= "xenpolicy-${PV}"
