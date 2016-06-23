@@ -17,11 +17,6 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.contains('XEN_TARGET_ARCH', 'x86_64', 'hvm', '', d)} \
     "
 
-SRC_URI_append = " \
-    file://0001-libfsimage-replace-deprecated-readdir_r-with-readdir.patch \
-    file://0002-libxl-replace-deprecated-readdir_r-with-readdir.patch \
-"
-
 FLASK_POLICY_FILE ?= "xenpolicy-${PV}"
 
 PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,virtual/libsdl,"
